@@ -1,15 +1,22 @@
 window.onload = function() {
     populateTodoDropdown();
+    populateCategoriesDropdown();
 };
 
-document.getElementById('addTodo').addEventListener('click', function() {
-    const userId = document.getElementById('addTodoUserDropdown').value;
-    const category = document.getElementById('addTodoCategory').value;
-    const description = document.getElementById('addTodoDescription').value;
-    const deadline = document.getElementById('addTodoDeadline').value;
-    const priority = document.getElementById('addTodoPriority').value;
+let addTodoele = document.getElementById('addTodo');
+console.log("addTodoele", addTodoele)
 
-    console.log(userId, category, description, deadline, priority);
+document.getElementById('addTodo').addEventListener('click', function() {
+    console.log("addTodo clicked")
+    const userid = document.getElementById('addTodoUserDropdown').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const deadline = document.getElementById('deadline').value;
+    const priority = document.getElementById('priority').value;
+
+
+    console.log(userid, category, description, deadline, priority);
+    console.log("category", category)
 
     fetch('http://localhost:8083/api/todos', {
         method: 'POST',
@@ -17,19 +24,18 @@ document.getElementById('addTodo').addEventListener('click', function() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            userId: userId,
+            userid: userid,
             category: category,
             description: description,
             deadline: deadline,
             priority: priority,
         })
     }).then(response => {
-        console.log("response", response)
-        // if (response.status === 201) {
-        //     alert('Todo added successfully');
-        // } else {
-        //     alert('Failed to add todo');
-        // }
+        if (response.status === 201) {
+            alert('Todo added successfully');
+        } else {
+            alert('Failed to add todo');
+        }
     });
 });
 
@@ -43,6 +49,20 @@ function populateTodoDropdown() {
                 option.value = user.id;
                 option.text = user.name;
                 userDropdown.appendChild(option);
+            });
+        });
+}
+
+function populateCategoriesDropdown() {
+    fetch('http://localhost:8083/api/categories')
+        .then(response => response.json())
+        .then(data => {
+            const categories = document.getElementById('category');
+            data.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.text = category.name;
+                categories.appendChild(option);
             });
         });
 }

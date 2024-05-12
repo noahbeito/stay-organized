@@ -290,15 +290,47 @@ app.put("/api/todos/:id", function (request, response) {
 });
 
 
-/*
+
 // DELETE a todo
 app.delete('/api/todos/:id', function (request, response) {
-    console.info("LOG: Got a DELETE request for ToDos.  This feature is not implemented.");
+    // --------------
+    const requestedId = request.params.id;
+
+
+    const json = fs.readFileSync(__dirname + "/data/todos.json", "utf8");
+    const todos = JSON.parse(json);
+
+    // Find the requested todo
+    const matchingTodo = todos.find((todo) => String(todo.id) === String(requestedId));
+    
+    // If todo not found, we have nothing left to do: respond
+    if (!matchingTodo) {
+        console.warn("LOG: **ERROR: todo does not exist!");
+        response
+            .status(404)
+            .end();
+
+        return;
+    }
+
+    const index = todos.indexOf(matchingTodo);
+
+    if (index > -1) {
+        todos.splice(index, 1);
+    }
+
+    fs.writeFileSync(__dirname + "/data/todos.json", JSON.stringify(todos));
+
+
+    // LOG data for tracing
+    console.info("LOG: This todo is deleted ->", matchingTodo);
+
+// -----------------
+
     response
         .status(200)
         .end();
 })
-*/
 
 
 // POST a new user
