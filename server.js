@@ -201,6 +201,48 @@ app.get("/api/users/:username", function (request, response) {
         .json(userWithoutPassword);
 });
 
+// GET a specific user by id
+// NOTE: this endpoint returns the user without the password
+app.get("/api/usersbyid/:id", function (request, response) {
+    const id = request.params.id;
+    console.info("LOG: Got a GET request for user with id " + id);
+
+    const json = fs.readFileSync(__dirname + "/data/users.json", "utf8");
+    const user = JSON.parse(json);
+
+    // Find the user
+    const byId = (user) => {
+        return String(user.id) === String(id);
+    }
+    const matchingUser = user.find(byId);
+
+    // If no matching user
+    if (!matchingUser) {
+        console.warn(`LOG: **NOT FOUND**: user ${id} does not exist!`);
+        
+        response
+            .status(404)
+            .end();
+    
+        return;
+    }
+
+    // Create a copy without the password
+    const userWithoutPassword = { 
+        id: matchingUser.id, 
+        name: matchingUser.name, 
+        username: matchingUser.username,
+    };
+
+    // LOG data for tracing
+    console.info("LOG: Returned user is ->", userWithoutPassword);
+
+    response
+        .status(200)
+        .json(userWithoutPassword);
+});
+
+
 
 // POST a new todo
 app.post("/api/todos", function (request, response) {

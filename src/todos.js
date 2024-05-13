@@ -35,10 +35,13 @@ function displayTodos(userId) {
                 const numberString = todoNumberMap.get(index + 1);
                 console.log("numberString", numberString)
                 let todoStatus;
+                let todoStatusButtonText
                 if (todo.completed === true) {
                   todoStatus = "✅"
+                  todoStatusButtonText = "Undo"
                 } else  {
                   todoStatus = "🔲"
+                  todoStatusButtonText = "Complete"
                 }
                 if (numberString) {
                     todoItem.innerHTML = `
@@ -56,7 +59,7 @@ function displayTodos(userId) {
                                 <p>Priority: ${todo.priority}</p>
                               </div>
                               <div>
-                                <button class="btn btn-primary" onclick="toggleComplete(${userId}, ${todo.id})">Toggle Complete</button>
+                                <button class="btn btn-primary" onclick="toggleComplete(${userId}, ${todo.id})">${todoStatusButtonText}</button>
                                 <button class="btn btn-danger" onclick="deleteTodo(${userId}, ${todo.id})">Delete</button>
                               </div>
                             </div>
