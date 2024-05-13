@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
@@ -19,9 +20,11 @@ app.use(express.urlencoded({ extended: false }));
 // Support application/json data
 app.use(express.json());
 
-// Serve static front-end files (HTML, etc.) from "./public"
-// app.use(express.static("public"));
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve static files from the "src" directory
+app.use('/src', express.static(path.join(__dirname, 'src')));
 
 ///////////////////////////////////////////////////////////////////////
 //   API ENDPOINTS ////////////////////////////////////////////////////
@@ -287,15 +290,47 @@ app.put("/api/todos/:id", function (request, response) {
 });
 
 
-/*
+
 // DELETE a todo
 app.delete('/api/todos/:id', function (request, response) {
-    console.info("LOG: Got a DELETE request for ToDos.  This feature is not implemented.");
+    // --------------
+    const requestedId = request.params.id;
+
+
+    const json = fs.readFileSync(__dirname + "/data/todos.json", "utf8");
+    const todos = JSON.parse(json);
+
+    // Find the requested todo
+    const matchingTodo = todos.find((todo) => String(todo.id) === String(requestedId));
+    
+    // If todo not found, we have nothing left to do: respond
+    if (!matchingTodo) {
+        console.warn("LOG: **ERROR: todo does not exist!");
+        response
+            .status(404)
+            .end();
+
+        return;
+    }
+
+    const index = todos.indexOf(matchingTodo);
+
+    if (index > -1) {
+        todos.splice(index, 1);
+    }
+
+    fs.writeFileSync(__dirname + "/data/todos.json", JSON.stringify(todos));
+
+
+    // LOG data for tracing
+    console.info("LOG: This todo is deleted ->", matchingTodo);
+
+// -----------------
+
     response
         .status(200)
         .end();
 })
-*/
 
 
 // POST a new user
@@ -356,5 +391,5 @@ app.post("/api/users", function (request, response) {
 
 const server = app.listen(8083, () => {
     const port = server.address().port;
-    console.info("App listening at port", port);
+    console.info("App listening at http://localhost:" + port);
 });

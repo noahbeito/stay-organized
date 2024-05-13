@@ -1,0 +1,44 @@
+.content {
+    padding: 2rem 4rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+    margin: auto;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="date"],
+form select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#accordion {
+    padding-top: 20px;
+}
+
+#logo {
+    width: 75px;
+}
