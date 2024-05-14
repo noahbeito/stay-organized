@@ -16,6 +16,13 @@ Stay Organized is a simple yet powerful task management application. It allows u
 
 - [delete_user.html](public/delete_user.html): This page allows for the deletion of a user account. It requires user confirmation before proceeding with the deletion.
 
+## Technologies
+[![Built with HTML](https://img.shields.io/badge/Built_with-HTML-orange)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![Built with JavaScript](https://img.shields.io/badge/Built_with-JavaScript-yellow)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Built with CSS](https://img.shields.io/badge/Built_with-CSS-blue)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![Built with Bootstrap](https://img.shields.io/badge/Built_with-Bootstrap-purple)](https://getbootstrap.com/)
+
+
 ## Project Setup
 
 To set up this server locally, you need to have Node.js installed on your machine. After cloning the repository, run `npm install` to install the necessary dependencies. Then, you can start the server by running `node server.js`.
