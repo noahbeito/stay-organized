@@ -80,9 +80,7 @@
           try {
             let usersResponse = await fetch(`http://localhost:8083/api/users`)
             let users = await usersResponse.json()
-            console.log("users: ", users);
             const totalUsers = users.length
-            console.log("totalUsers: ", totalUsers);
             let todosResponse = await fetch(`http://localhost:8083/api/todos`)
             let todos = await todosResponse.json()
             let totalTodos = todos.length
@@ -92,8 +90,7 @@
                 if (userStats[user.id] === undefined) {
                   userStats[user.id] = { completedTodos: 0, incompleteTodos: 0 };
                 }
-
-                let userTodos = todos.filter(todo => todo.userid === user.id);
+                let userTodos = todos.filter(todo => Number(todo.userid) === Number(user.id));
 
                 userTodos.forEach(todo => {
                   if (todo.completed) {
