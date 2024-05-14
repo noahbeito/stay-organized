@@ -407,8 +407,10 @@ app.post("/api/users", function (request, response) {
         return;
     }
 
+    console.log("this tha: ", users[users.length - 1].id + 1)
+
     const user = {
-        id: users.length + 1,
+        id: users[users.length - 1].id + 1,
         name: request.body.name,
         username: request.body.username,
         password: request.body.password,
@@ -424,6 +426,49 @@ app.post("/api/users", function (request, response) {
         .status(201)
         .json(user);
 });
+
+app.delete('/api/users/:id', function (request, response) {
+    const requestedId = request.params.id;
+
+    const usersJson = fs.readFileSync(__dirname + "/data/users.json", "utf8");
+    const users = JSON.parse(usersJson);
+
+    // Find the requested user
+    const matchingUser = users.find((user) => String(user.id) === String(requestedId));
+    
+    // If user not found, we have nothing left to do: respond
+    if (!matchingUser) {
+        console.warn("LOG: **ERROR: user does not exist!");
+        response
+            .status(404)
+            .end();
+
+        return;
+    }
+
+    const userIndex = users.indexOf(matchingUser);
+
+    if (userIndex > -1) {
+        users.splice(userIndex, 1);
+    }
+
+    fs.writeFileSync(__dirname + "/data/users.json", JSON.stringify(users));
+
+    // Delete all todos associated with the user
+    const todosJson = fs.readFileSync(__dirname + "/data/todos.json", "utf8");
+    const todos = JSON.parse(todosJson);
+
+    const updatedTodos = todos.filter((todo) => String(todo.userid) !== String(requestedId));
+
+    fs.writeFileSync(__dirname + "/data/todos.json", JSON.stringify(updatedTodos));
+
+    // LOG data for tracing
+    console.info("LOG: This user and their todos are deleted ->", matchingUser);
+
+    response
+        .status(200)
+        .end();
+})
 
 
 ///////////////////////////////////////////////////////////////////////

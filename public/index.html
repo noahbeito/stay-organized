@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="../src/css/styles.css">
     <title>Stay Organized</title>
 </head>
@@ -25,18 +26,18 @@
                 <li><a href="todos.html" class="nav-link">Todo List</a></li>
             </li>
             <li class="nav-item">
-                <li><a href="new_todo.html" class="nav-link">New todo</a></li>
+                <li><a href="new_todo.html" class="nav-link">New Todo</a></li>
             </li>
 
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown
+                  Manage Users
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="new_user.html">Add User</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
+                  <li><a class="dropdown-item" href="delete_user.html">Remove User</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  <li><a class="dropdown-item" href="macgruber.html">MacGruber</a></li>
                 </ul>
               </li>
             </ul>
@@ -45,7 +46,6 @@
       </nav>
       <div class="content">
           <div class="dashboard">
-            <h2>User Statistics</h2>
             <div class="user-stats">
               <div class="stat">
                 <h3>Total Users</h3>
@@ -70,91 +70,74 @@
                 <th>Incomplete Todos</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- Rows will be added here by JavaScript -->
-            </tbody>
+            <tbody></tbody>
           </table>
       </div>
       <script>
         const userStats = {}
 
-        let totalUsers = 0;
-
         window.onload = async () => {
           try {
             let usersResponse = await fetch(`http://localhost:8083/api/users`)
             let users = await usersResponse.json()
-            totalUsers = users.length
+            console.log("users: ", users);
+            const totalUsers = users.length
+            console.log("totalUsers: ", totalUsers);
             let todosResponse = await fetch(`http://localhost:8083/api/todos`)
             let todos = await todosResponse.json()
             let totalTodos = todos.length
             let totalCompletedTodos = todos.filter(todo => todo.completed).length;
             let totalIncompleteTodos = totalTodos - totalCompletedTodos;
-            todos.forEach(todo => {
-                console.log("todo: ", todo);
-                // Initialize userStats[todo.userid] if it's not defined
-                if (userStats[todo.userid] === undefined) {
-                  userStats[todo.userid] = { completedTodos: 0, incompleteTodos: 0 };
-                  totalUsers++;
+            users.forEach(user => {
+                if (userStats[user.id] === undefined) {
+                  userStats[user.id] = { completedTodos: 0, incompleteTodos: 0 };
                 }
-                if (todo.completed) {
-                  userStats[todo.userid].completedTodos++;
-                } else {
-                  userStats[todo.userid].incompleteTodos++;
-                }
+
+                let userTodos = todos.filter(todo => todo.userid === user.id);
+
+                userTodos.forEach(todo => {
+                  if (todo.completed) {
+                    userStats[user.id].completedTodos++;
+                  } else {
+                    userStats[user.id].incompleteTodos++;
+                  }
+                });
               });
+
               document.querySelector('.user-stats').innerHTML = `
                 <div class="stat">
-                  <h3>Total Users</h3>
+                  <h3>Headcount</h3>
                   <p>${totalUsers}</p>
                 </div>
                 <div class="stat">
-                  <h3>Incomplete Todos</h3>
-                  <p>${totalIncompleteTodos}</p>
+                  <h3>Total Completed</h3>
+                  <p>${totalCompletedTodos}</p>
                 </div>
                 <div class="stat">
-                  <h3>Completed Todos</h3>
-                  <p>${totalCompletedTodos}</p>
+                  <h3>Total Incomplete</h3>
+                  <p>${totalIncompleteTodos}</p>
                 </div>
               `
             console.log("userStats: ", userStats);
 
-            Object.keys(userStats).forEach(async userid => {
-              try {
-                let username = await fetch(`http://localhost:8083/api/usersbyid/${userid}`)
-                let user = await username.json()
-                console.log("user: ", user);
-                // create a new row for the user if it doesn't exist
-                let userRow = document.getElementById(`user-${user.id}`);
-                if (!userRow) {
-                  userRow = document.createElement('tr');
-                  userRow.id = `user-${user.id}`;
+            for (let i = 0; i < totalUsers; i++) {
+              let user = users[i];
+              let userRow = document.createElement('tr');
+              userRow.id = `user-${user.id}`;
+              userRow.innerHTML = `
+                <td>${user.name}</td>
+                <td id="completed-${user.id}">0</td>
+                <td id="incomplete-${user.id}">0</td>
+              `;
+              document.querySelector('#user-table tbody').appendChild(userRow);
 
-                  // add cells for the user name and todo counts
-                  userRow.innerHTML = `
-                    <td>${user.name}</td>
-                    <td id="completed-${user.id}">0</td>
-                    <td id="incomplete-${user.id}">0</td>
-                  `;
-
-                  // add the new row to the table
-                  document.querySelector('#user-table tbody').appendChild(userRow);
-                }
-
-                // update the todo counts
-                document.getElementById(`completed-${user.id}`).textContent = userStats[user.id].completedTodos;
-                document.getElementById(`incomplete-${user.id}`).textContent = userStats[user.id].incompleteTodos;
-              } catch (error) {
-                console.error(error)
-              }
-            })
+              document.getElementById(`completed-${user.id}`).textContent = userStats[user.id].completedTodos;
+              document.getElementById(`incomplete-${user.id}`).textContent = userStats[user.id].incompleteTodos;
+            }
           } catch (error) {
             console.error(error)
         }
       }
-
       </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
 </body>
 </html>
