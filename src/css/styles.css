@@ -151,3 +151,7 @@ form input[type="submit"]:hover {
 .todo-label {
     font-style: italic;
 }
+
+.alert-success {
+    display: none;
+}

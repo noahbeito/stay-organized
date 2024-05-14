@@ -30,12 +30,7 @@ document.getElementById('addTodo').addEventListener('click', function(event) {
         })
     }).then(response => {
         if (response.status === 201) {
-            document.getElementById('alert-placeholder').innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Todo added successfully
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
+            showSuccessAlert('Todo added successfully');
             document.getElementById('category').value = '';
             document.getElementById('description').value = '';
             document.getElementById('deadline').value = '';
@@ -85,4 +80,14 @@ function populateCategoriesDropdown() {
                 categories.appendChild(option);
             });
         });
+}
+
+function showSuccessAlert(message) {
+    const alert = document.getElementById('success-alert');
+    alert.textContent = message;
+    alert.style.display = 'block';
+
+    setTimeout(() => {
+        alert.style.display = 'none';
+    }, 2000); 
 }
