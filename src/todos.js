@@ -1,15 +1,3 @@
-let todoNumberMap = new Map();
-todoNumberMap.set(1, 'One');
-todoNumberMap.set(2, 'Two');
-todoNumberMap.set(3, 'Three');
-todoNumberMap.set(4, 'Four');
-todoNumberMap.set(5, 'Five');
-todoNumberMap.set(6, 'Six');
-todoNumberMap.set(7, 'Seven');
-todoNumberMap.set(8, 'Eight');
-todoNumberMap.set(9, 'Nine');
-todoNumberMap.set(10, 'Ten');
-
 window.onload = function() {
     populateTodoDropdown();
 }
@@ -27,43 +15,69 @@ function displayTodos(userId) {
             const todos = document.getElementById('accordion');
             todos.innerHTML = `
             `;
+
+            if (data.length === 0) {
+                todos.innerHTML = `
+                    <div class="alert alert-info" role="alert">
+                        No todos found for this user.
+                    </div>
+                `;
+            }
+
             data.forEach((todo, index) => {
                 const todoItem = document.createElement('div');
                 todoItem.classList.add('accordion-item');
 
-                // Get the string representation of the current index from todoNumberMap
-                const numberString = todoNumberMap.get(index + 1);
-                console.log("numberString", numberString)
                 let todoStatus;
-                if (todo.completed === true) {
-                  todoStatus = "✅"
-                } else  {
-                  todoStatus = "🔲"
+                let todoStatusButtonText
+
+                let priorityClass = '';
+                let completedClass = '';
+
+                switch(todo.priority) {
+                    case 'High':
+                        priorityClass = 'priority-high';
+                        break;
+                    case 'Medium':
+                        priorityClass = 'priority-medium';
+                        break;
+                    case 'Low':
+                        priorityClass = 'priority-low';
+                        break;
                 }
-                if (numberString) {
-                    todoItem.innerHTML = `
-                        <h2 class="accordion-header">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${numberString}" aria-expanded="false" aria-controls="collapse${numberString}">
-                            ${todoStatus} ${todo.description}  
-                          </button>
-                        </h2>
-                        <div id="collapse${numberString}" class="accordion-collapse collapse">
-                          <div class="accordion-body">
-                            <div class="d-flex justify-content-between">
-                              <div>
-                                <p>Category: ${todo.category}</p>
-                                <p>Deadline: ${todo.deadline}</p>
-                                <p>Priority: ${todo.priority}</p>
-                              </div>
-                              <div>
-                                <button class="btn btn-primary" onclick="toggleComplete(${userId}, ${todo.id})">Toggle Complete</button>
-                                <button class="btn btn-danger" onclick="deleteTodo(${userId}, ${todo.id})">Delete</button>
-                              </div>
-                            </div>
+
+                if (todo.completed === true) {
+                  todoStatus = "✅";
+                  todoStatusButtonText = "Undo";
+                  completedClass = "todo-completed";
+                } else  {
+                  todoStatus = "🔲";
+                  todoStatusButtonText = "Complete";
+                  completedClass = "";
+                }
+                
+                todoItem.innerHTML = `
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed ${priorityClass} ${completedClass}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
+                        ${todoStatus} ${todo.description}  
+                      </button>
+                    </h2>
+                    <div id="collapse${index}" class="accordion-collapse collapse">
+                      <div class="accordion-body ${completedClass}">
+                        <div class="d-flex justify-content-between">
+                          <div>
+                            <p><span class="todo-label">Category:</span> ${todo.category}</p>
+                            <p><span class="todo-label">Deadline:</span> ${formatDate(todo.deadline)}</p>
+                            <p><span class="todo-label">Priority:</span> ${todo.priority}</p>
+                          </div>
+                          <div>
+                            <button class="btn btn-primary" onclick="toggleComplete(${userId}, ${todo.id})">${todoStatusButtonText}</button>
+                            <button class="btn btn-danger" onclick="deleteTodo(${userId}, ${todo.id})">Delete</button>
                           </div>
                         </div>
-                    `;
-                }
+                      </div>
+                    </div>
+                `;
                 todos.appendChild(todoItem);
             });
         });
@@ -115,4 +129,10 @@ function deleteTodo(userId, todoId) {
     }
   })
   .catch(err => console.error(err))
+}
+
+function formatDate(dateString) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', options).format(date);
 }

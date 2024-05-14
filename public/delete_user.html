@@ -43,28 +43,63 @@
             </ul>
           </div>
         </div>
-    </nav>
-
-    <div class="content">
-      <h2 class="text-center text-dark">Create a New User</h2>
-      <br>
-        <form>
-          <label for="name">Name:</label>
-          <input type="text" id="name" name="name" required>
-          <br>
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required>
-          <br>
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required>
-          <br>
-          <label for="confirm-password">Confirm Password:</label>
-            <input type="password" id="confirm-password" name="confirm-password" required>
-          <br>
-          <input id="addUser" type="submit" value="Create User">
-      </form>
+      </nav>
+      <div class="content">
+        <h2 class="text-center text-dark">Manage Users</h2>
+          <table id="user-table">
+              <tbody>
+              </tbody>
+          </table>
       </div>
-    <script src="../src/new_user.js"></script>
+
+    <script>
+        fetchUsers().then(users => {
+            const tableBody = document.querySelector('#user-table tbody');
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                const userCell = document.createElement('td');
+                userCell.textContent = user.name;
+                row.appendChild(userCell);
+
+                const deleteButtonCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('btn', 'btn-danger');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteUser(user.id));
+                deleteButtonCell.appendChild(deleteButton);
+                row.appendChild(deleteButtonCell);
+
+                tableBody.appendChild(row);
+            });
+        });
+
+        async function fetchUsers() {
+            try {
+                let usersResponse = await fetch(`http://localhost:8083/api/users`)
+                let users = await usersResponse.json()
+                console.log("users: ", users);
+                return users;
+            } catch {
+                console.error('Failed to fetch users');
+            }
+        }
+
+        async function deleteUser(userId) {
+            try {
+                let response = await fetch(`http://localhost:8083/api/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete user');
+                }
+                console.log(`User ${userId} deleted`);
+                window.location.href = 'delete_user.html';
+            } catch {
+                console.error('Failed to delete user');
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

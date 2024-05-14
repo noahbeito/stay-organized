@@ -3,10 +3,8 @@ window.onload = function() {
     populateCategoriesDropdown();
 };
 
-let addTodoele = document.getElementById('addTodo');
-console.log("addTodoele", addTodoele)
-
-document.getElementById('addTodo').addEventListener('click', function() {
+document.getElementById('addTodo').addEventListener('click', function(event) {
+    event.preventDefault();
     console.log("addTodo clicked")
     const userid = document.getElementById('addTodoUserDropdown').value;
     const category = document.getElementById('category').value;
@@ -32,7 +30,11 @@ document.getElementById('addTodo').addEventListener('click', function() {
         })
     }).then(response => {
         if (response.status === 201) {
-            alert('Todo added successfully');
+            showSuccessAlert('Todo added successfully');
+            document.getElementById('category').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('deadline').value = '';
+            document.getElementById('priority').value = 'Medium';
         } else {
             alert('Failed to add todo');
         }
@@ -44,6 +46,12 @@ function populateTodoDropdown() {
         .then(response => response.json())
         .then(data => {
             const userDropdown = document.getElementById('addTodoUserDropdown');
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = '';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            userDropdown.appendChild(defaultOption);
             data.forEach(user => {
                 const option = document.createElement('option');
                 option.value = user.id;
@@ -58,6 +66,13 @@ function populateCategoriesDropdown() {
         .then(response => response.json())
         .then(data => {
             const categories = document.getElementById('category');
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = '';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            categories.appendChild(defaultOption);
+
             data.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.name;
@@ -65,4 +80,14 @@ function populateCategoriesDropdown() {
                 categories.appendChild(option);
             });
         });
+}
+
+function showSuccessAlert(message) {
+    const alert = document.getElementById('success-alert');
+    alert.textContent = message;
+    alert.style.display = 'block';
+
+    setTimeout(() => {
+        alert.style.display = 'none';
+    }, 2000); 
 }
